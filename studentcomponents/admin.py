@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import StudentDetail, StudentParent, StudentSibling, LookUp, Coordinator,\
-    Payment, PaymentPaidRecord, StudentDocument, Assessment
+    Payment, PaymentPaidRecord, StudentDocument, AssessmentAdmission
 from daterange_filter.filter import DateRangeFilter
 
 admin.site.site_header = 'WARDS Admin Page'
@@ -8,11 +8,12 @@ admin.site.site_header = 'WARDS Admin Page'
 
 class LookUpAdmin(admin.ModelAdmin):
     list_display = ('lookup_type', 'lookup_name', 'lookup_inputvalue', 'lookup_outputvalue')
+    list_filter = ['lookup_type', 'lookup_name', 'lookup_inputvalue', 'lookup_outputvalue']
 
 
 class StudentDetailAdmin(admin.ModelAdmin):
-    list_display = ('admission_number', 'upper_case_name', 'gender', 'date_of_join')
-    list_filter = ['admission_number', 'date_of_join']
+    list_display = ('admission_number', 'first_name', 'last_name', 'age', 'disability', 'gender', 'date_of_join', 'caste')
+    list_filter = ['admission_number', 'date_of_join', 'caste']
 
 
 class StudentParentAdmin(admin.ModelAdmin):
@@ -34,7 +35,7 @@ class StudentSiblingAdmin(admin.ModelAdmin):
 
 
 class CoordinatorAdmin(admin.ModelAdmin):
-    list_display = ('first_name', 'last_name', 'self_help_skill')
+    list_display = ('admission_no', 'first_name', 'last_name', 'self_help_skill')
 
 
 class PaymentPaidRecordAdmin(admin.ModelAdmin):
@@ -43,16 +44,30 @@ class PaymentPaidRecordAdmin(admin.ModelAdmin):
 
 
 class PaymentAdmin(admin.ModelAdmin):
-    list_display = ('student', 'admission_fees_set', 'admission_fees_paid', 'uniform_fees_set', 'uniform_fees_paid')
+    list_display = ('student', 'admission_fees_set', 'uniform_fees_set', 'monthly_fees_set')
+    list_filter = ['student']
+
+
+class AssessmentAdmissionAdmin(admin.ModelAdmin):
+    list_display = ('admission_number', 'heading', 'field')
+    list_filter = ['admission_number']
+
+
+class StudentDocumentAdmin(admin.ModelAdmin):
+    list_display = ('admission_number', 'student_picture', 'guardian_picture', 'adhaar_card_student',
+                    'adhaar_card_guardian', 'student_disability_card', 'student_birth_certificate',
+                    'student_caste_certificate', 'student_Niramaya_card')
+    list_filter = ['admission_number']
 
 
 admin.site.register(StudentDetail, StudentDetailAdmin)
 admin.site.register(StudentParent, StudentParentAdmin)
 admin.site.register(StudentSibling, StudentSiblingAdmin)
 admin.site.register(LookUp, LookUpAdmin)
-admin.site.register(Coordinator)
+admin.site.register(Coordinator, CoordinatorAdmin)
 admin.site.register(Payment, PaymentAdmin)
 admin.site.register(PaymentPaidRecord, PaymentPaidRecordAdmin)
-admin.site.register(StudentDocument)
-admin.site.register(Assessment)
+admin.site.register(StudentDocument, StudentDocumentAdmin)
+
+admin.site.register(AssessmentAdmission, AssessmentAdmissionAdmin)
 

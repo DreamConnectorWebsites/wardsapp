@@ -34,31 +34,31 @@ class StudentDetail(models.Model):
         ('LEFT', 'LEFT')
     ]
     student = models.AutoField(primary_key=True)
-    first_name = models.CharField(max_length=50, verbose_name="First Name")
-    last_name = models.CharField(max_length=50, verbose_name="Last Name")
+    first_name = models.CharField(max_length=200, verbose_name="First Name")
+    last_name = models.CharField(max_length=200, verbose_name="Last Name")
     student_birthday = models.DateField(null=True, verbose_name="Date of Birth")
-    religion = models.CharField(max_length=15, null=True)
+    religion = models.CharField(max_length=20, null=True)
     caste = models.CharField(max_length=15, null=True, choices=CASTE_CHOICES)
     gender = models.CharField(max_length=15, choices=GENDER_CHOICES)
-    identification_mark = models.CharField(max_length=300, verbose_name="Identification Marks", null=True)
+    identification_mark = models.CharField(max_length=500, verbose_name="Identification Marks", null=True)
     blood_group = models.CharField(max_length=8, verbose_name="Blood Group", null=True, choices=BLOODGROUP_CHOICES)
     admission_number = models.ForeignKey('Coordinator', on_delete=models.CASCADE)
     date_of_join = models.DateField(null=True)
-    referred_by = models.CharField(max_length=50, verbose_name="Referred By", null=True)
-    last_attended_institute_name = models.CharField(max_length=100, verbose_name="Last attended Institute Name",
+    referred_by = models.CharField(max_length=200, verbose_name="Referred By", null=True)
+    last_attended_institute_name = models.CharField(max_length=200, verbose_name="Last attended Institute Name",
                                                     null=True)
-    reason_for_leaving = models.CharField(max_length=200, verbose_name="Reason for leaving", null=True)
-    disability = models.CharField(max_length=100, null=True)
+    reason_for_leaving = models.CharField(max_length=500, verbose_name="Reason for leaving", null=True)
+    disability = models.CharField(max_length=200, null=True)
     disability_percentage = models.CharField(max_length=5, default=10)
     languages_known = models.CharField(verbose_name="Languages Known", max_length=50)
     food_preference = models.CharField(max_length=15, verbose_name="Food Preference", choices=FOOD_CHOICES)
     weight = models.IntegerField(verbose_name="Weight", null=True)
-    class1 = models.CharField(max_length=50, null=True)
-    class_teacher = models.CharField(max_length=100)
+    class1 = models.CharField(max_length=100, null=True)
+    class_teacher = models.CharField(max_length=200)
     attendance = models.IntegerField(null=True)
     height = models.CharField(max_length=5, null=True)
     status = models.CharField(max_length=100, choices=STATUS, default="CURRENT")
-    address = models.CharField(max_length=200, blank=False)
+    address = models.CharField(max_length=500, blank=False)
 
     def __str__(self):
         return ('%s %s %s' % (self.admission_number, self.first_name, self.last_name))
@@ -84,12 +84,12 @@ class StudentParent(models.Model):
         ('GUARDIAN', 'GUARDIAN'),
     ]
     student_parent = models.AutoField(primary_key=True)
-    parent_name = models.CharField(max_length=50)
+    parent_name = models.CharField(max_length=200)
     student = models.ForeignKey('StudentDetail',on_delete=models.CASCADE)
     relation_type = models.CharField(max_length=15, verbose_name="Relation type",null=True, choices=RELATIONSHIP_CHOICES)
-    occupation = models.CharField(max_length=12, null=True)
+    occupation = models.CharField(max_length=100, null=True)
     phone_number = models.CharField(max_length=12, verbose_name="Phone number", null=True)
-    email_id = models.EmailField(max_length=70, blank=True, null= True, verbose_name="Email Id")
+    email_id = models.EmailField(max_length=100, blank=True, null= True, verbose_name="Email Id")
     address = models.CharField(max_length=300, null=True)
 
     def __str__(self):
@@ -99,9 +99,9 @@ class StudentParent(models.Model):
 class StudentSibling(models.Model):
     sibling = models.AutoField(primary_key=True)
     student = models.ForeignKey('StudentDetail',on_delete=models.CASCADE)
-    sibling_name = models.CharField(max_length=50)
+    sibling_name = models.CharField(max_length=200)
     sibling_age = models.IntegerField(null=True)
-    sibling_occupation = models.CharField(max_length=12, null=True)
+    sibling_occupation = models.CharField(max_length=200, null=True)
 
     def __str__(self):
         return ('%s' % (self.sibling_name))
@@ -116,9 +116,9 @@ class LookUp(models.Model):
     lookup_type = models.CharField(max_length=15,
                                    default="Assessment",
                                    choices=LOOKUP_TYPE_CHOICES)
-    lookup_name = models.CharField(max_length=100)
-    lookup_inputvalue = models.CharField(max_length=100)
-    lookup_outputvalue = models.CharField(max_length=100, null=True, blank=True)
+    lookup_name = models.CharField(max_length=500)
+    lookup_inputvalue = models.CharField(max_length=500)
+    lookup_outputvalue = models.CharField(max_length=500, null=True, blank=True)
 
    # def __str__(self):
         #return ('%s %s %s %s' % (self.lookup_type,self.lookup_name,self.lookup_inputvalue,self.lookup_outputvalue))
@@ -132,9 +132,9 @@ class Coordinator(models.Model):
         ('Bathing', 'Bathing'),
         ('Toilet Training', 'ToiletTraining')
     ]
-    first_name = models.CharField(max_length=50)
-    last_name = models.CharField(max_length=50)
-    disability = models.CharField(max_length=50)
+    first_name = models.CharField(max_length=200)
+    last_name = models.CharField(max_length=200)
+    disability = models.CharField(max_length=200)
     self_help_skill = MultiSelectField(verbose_name="Self Help", choices=SELF_HELP)
     behavioural_issues = models.CharField(max_length=500,null=True)
     medication_taken = models.CharField(max_length=500,null=True)
@@ -166,6 +166,8 @@ class PaymentPaidRecord(models.Model):
                                       verbose_name="Payment Type:")
     fees_paid = models.IntegerField(blank=False, verbose_name="Fee Amount (in Rs.)")
     fees_paid_date = models.DateField(null=True, blank=False, verbose_name="Fee Payment Date")
+    fees_comments = models.CharField(max_length=400, null=True, blank=True, default="No Comments Added (max 400)",
+                                     verbose_name="Comments")
     def __str__(self):
         return ('%s' % (self.payment))
 
@@ -174,7 +176,7 @@ class StudentDocument(models.Model):
     admission_number = models.ForeignKey('StudentDetail', on_delete=models.CASCADE)
     assessment_sheet = models.FileField(null=True)
     student_picture = models.FileField(null=True)
-    gaurdian_picture = models.FileField(null=True)
+    guardian_picture = models.FileField(null=True)
     adhaar_card_student = models.FileField(null=True)
     adhaar_card_guardian = models.FileField(null=True)
     student_disability_card = models.FileField(null=True)
@@ -190,3 +192,10 @@ class Assessment(models.Model):
     admission_number = models.ForeignKey('StudentDetail', on_delete=models.CASCADE)
     lookup_type = models.ForeignKey('LookUp', on_delete=models.CASCADE)
     grade = models.CharField(null=True, max_length=5)
+
+
+class AssessmentAdmission(models.Model):
+    admission_number = models.ForeignKey('StudentDetail', on_delete=models.CASCADE)
+    lookup_assessment_object = models.ForeignKey('LookUp', on_delete=models.CASCADE)
+    heading = models.CharField(max_length=200, null=True, blank=True)
+    field = models.CharField(max_length=200, null=True, blank=True)    

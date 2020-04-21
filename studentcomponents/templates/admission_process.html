@@ -61,6 +61,14 @@
     -webkit-appearance: none;
     display: none;
 }
+
+.asterik{
+    color: red;
+}
+
+label{
+    font-weight: 500;
+}
 </style>
 
 
@@ -159,6 +167,8 @@ jQuery(document).delegate('a.add-recordparent', 'click', function(e) {
     <ol class="breadcrumb" style="background: transparent; font-size:14px; font-weight:700;">
     <li class="breadcrumb-item"><a href="{% url 'project-home' %}" style="text-decoration:none">Home</a></li>
     <li class="breadcrumb-item active" aria-current="page">Admission Form</li>
+    <li class="breadcrumb-item"><a href="{% url 'assessment_form_submit' %}" style="text-decoration:none">Asessment Form</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'payment_form' %}" style="text-decoration:none">Payment Form</a></li>
   </ol><br>
 
 <div class="container" style="">
@@ -182,7 +192,10 @@ jQuery(document).delegate('a.add-recordparent', 'click', function(e) {
         </div>
     </div>
 </div>
-
+<br>
+    <small class="text-muted">
+        <p><span class="asterik"><b>*</b></span> Fields marked are mandatory</p>
+    </small>
 <!-- First Step -->
 <form enctype="multipart/form-data" action="submit_admission" method="post" id="admission_form" class="needs-validation">
     <div class="row setup-content-2" id="step-1">
@@ -202,11 +215,11 @@ jQuery(document).delegate('a.add-recordparent', 'click', function(e) {
                 </div>
                 <div class="form-row">
                     <div class="form-group col-md-2">
-                      <label>Date of birth <span class="asterick">*</span></label><br>
+                      <label>Date of birth <span class="asterik">*</span></label><br>
                       <input type="date" class="form-control form-control-sm" placeholder="" name="student_birthday" id="student_birthday" required>
                     </div>
                     <div class="form-group col-md-1">
-                        <label>Gender<span class="asterick">*</span></label><br>
+                        <label>Gender<span class="asterik">*</span></label><br>
                         <select name="gender" id="gender" class="form-control form-control-sm">
                           <option value="Female" name="gender" selected>Female</option>
                           <option value="Male" name="gender">Male</option>
@@ -214,7 +227,7 @@ jQuery(document).delegate('a.add-recordparent', 'click', function(e) {
                         </select>
                     </div>
                     <div class="form-group col-md-2">
-                        <label>Religion<span class="asterick">*</span></label><br>
+                        <label>Religion<span class="asterik">*</span></label><br>
                         <select name="religion" id="religion" class="form-control form-control-sm" onchange="showDiv('hiddden_div', this)">
                           {% for religion in lookup_religion %}
                           <option value={{ religion.lookup_inputvalue }} name="religion">{{ religion.lookup_inputvalue |title }}</option>
@@ -224,20 +237,21 @@ jQuery(document).delegate('a.add-recordparent', 'click', function(e) {
                     </div>
 
                     <div class="form-group col-md-1">
-                          <label>Caste<span class="asterick">*</span></label><br>
+                          <label>Caste<span class="asterik">*</span></label><br>
                           <select name="caste" id="caste" class="form-control form-control-sm">
-                          <option value="general" name="caste" value="GENERAL"selected>General</option>
+						  <option selected name="caste" value="none">Choose</option>
+                          <option value="general" name="caste" value="GENERAL">General</option>
                           <option value="obc" name="caste" value="OBC">OBC</option>
                           <option value="sc" name="caste" value="SC">SC</option>
                           <option value="st" name="caste" value="ST">ST</option>
                           </select>
                     </div>
                     <div class="form-group col-md-2">
-                      <label>Language<span class="asterick">*</span></label>
+                      <label>Language<span class="asterik">*</span></label>
                       <input type="text" class="form-control form-control-sm" placeholder="Languages" name="language" id="language">
                     </div>
                     <div class="form-group col-md-2">
-                        <label>Blood Group<span class="asterick">*</span></label><br>
+                        <label>Blood Group<span class="asterik">*</span></label><br>
                           <select name="blood_group" id="blood_group" class="form-control form-control-sm">
                           <option name="blood_group" value="A+" selected>A+</option>
                           <option name="blood_group" value="B+">B+</option>
@@ -250,7 +264,7 @@ jQuery(document).delegate('a.add-recordparent', 'click', function(e) {
                           </select>
                     </div>
                     <div class="form-group col-md-2">
-                        <label>Food Preference<span class="asterick">*</span></label><br>
+                        <label>Food Preference<span class="asterik">*</span></label><br>
                         <select name="food_preference" id="food_preference" class="form-control form-control-sm">
                         <option value="Vegetarian" name="food_preference" selected>Vegetarian</option>
                         <option value="Non-Vegetarian" name="food_preference">Non-Vegetarian</option>
@@ -463,31 +477,28 @@ jQuery(document).delegate('a.add-recordparent', 'click', function(e) {
             <div class="form-row">
                 <div class="form-group col-md-1"></div>
                 <div class="form-group col-md-4">
+                    <label for="admfee">Admission fee <span class="asterik">*</span> :</label>
                     <input type="number" class="form-control form-control-sm" placeholder="Admission Fees (One-time) set*" name="admfee" id="admfee" required>
                 </div>
                 <div class="form-group col-md-1"></div>
-                <div class="form-group col-md-4">
-                    <input type="number" class="form-control form-control-sm" placeholder="Admission Fees Paid" name="admfeepaid" id="admfeepaid">
-                </div>
+
             </div>
             <div class="form-row">
                 <div class="form-group col-md-1"></div>
                 <div class="form-group col-md-4">
+                    <label for="monfee">Monthly fee <span class="asterik">*</span> :</label>
                     <input type="number" class="form-control form-control-sm" placeholder="Monthly School Fees set*" name="monFee" id="monFee" required>
                 </div>
                 <div class="form-group col-md-1"></div>
                 <div class="form-group col-md-4">
+                    <label for="unifee">Uniform fee <span class="asterik">*</span> :</label>
                     <input type="number" class="form-control form-control-sm" placeholder="Uniform Fees set*" name="unifee" id="unifee" required>
                 </div>
             </div>
-            <div class="form-row">
-                <div class="form-group col-md-1"></div>
-                <div class="form-group col-md-4">
-                    <input type="number" class="form-control form-control-sm" placeholder="Uniform Fee Paid" name="uniFeePaid" id="uniFeePaid">
-                </div>
-            </div>
+
 
         </div></div>
+
     <!-- Third Step -->
     <div class="row setup-content-2" id="step-3">
         <div class="">
@@ -496,23 +507,8 @@ jQuery(document).delegate('a.add-recordparent', 'click', function(e) {
             <table>
                 <tr>
                     <div class="col-md-3">
-                         <td>Upload Assessment Sheet</td>
-                         <td><input type="file" class="" name="assessment_sheet" id="assessment_sheet"></td>
-                             <script>
-                                var uploadField = document.getElementById("assessment_sheet");
-                                uploadField.onchange = function() {
-                                if(this.files[0].size > 204800){
-                                   alert("File is too big! Size should be less than 200KB");
-                                   this.value = "";
-                                };
-                                };
-                             </script>
-                      </div>
-                    <td><div class="col-md-2"></div></td>
-
-                      <div class="col-md-3">
-                         <td>Student photograph</td>
-                         <td><input type="file" class="" name="student_pic" id="student_pic"></td>
+                        <td><label>Student Photograph</label></td>
+                        <td><input type="file" class="" name="student_pic" id="student_pic"></td>
                              <script>
                                  var uploadField = document.getElementById("student_pic");
                                  uploadField.onchange = function() {
@@ -522,13 +518,10 @@ jQuery(document).delegate('a.add-recordparent', 'click', function(e) {
                                  };
                                  };
                              </script>
-                      </div>
-                   </td>
-                   </div>
-                </tr>
-                 <tr>
+                    </div>
+                    <td><div class="col-md-2"></div></td>
                     <div class="col-md-3">
-                         <td>Student Adhaar Card</td>
+                        <td><label>Student Adhaar Card</label></td>
                          <td><input type="file" class="" name="adhaar_card_student" id="adhaar_card_student"></td>
                              <script>
                                 var uploadField = document.getElementById("adhaar_card_student");
@@ -540,9 +533,25 @@ jQuery(document).delegate('a.add-recordparent', 'click', function(e) {
                                 };
                              </script>
                       </div>
-                    <td><div class="col-md-2"></div></td>
+
+                 </tr>
+                 <tr>
                       <div class="col-md-3">
-                         <td>Guardian Adhaar Card</td>
+                          <td><label>Student Caste Certificate</label></td>
+                         <td><input type="file" class="" name="student_caste_certificate" id="student_caste_certificate"></td>
+                             <script>
+                                 var uploadField = document.getElementById("student_caste_certificate");
+                                 uploadField.onchange = function() {
+                                 if(this.files[0].size > 204800){
+                                     alert("File is too big! Size should be less than 200KB");
+                                     this.value = "";
+                                 };
+                                 };
+                             </script>
+                      </div>
+                     <td><div class="col-md-2"></div></td>
+                      <div class="col-md-3">
+                          <td><label>Guardian Adhaar Card</label></td>
                          <td><input type="file" class="" name="adhaar_card_guardian" id="adhaar_card_guardian"></td>
                              <script>
                                  var uploadField = document.getElementById("adhaar_card_guardian");
@@ -558,7 +567,7 @@ jQuery(document).delegate('a.add-recordparent', 'click', function(e) {
                 </tr>
                  <tr>
                     <div class="col-md-3">
-                         <td>Student Disability Card</td>
+                        <td><label>Student Disability Card</label></td>
                          <td><input type="file" class="" name="student_disability_card" id="student_disability_card"></td>
                              <script>
                                 var uploadField = document.getElementById("student_disability_card");
@@ -572,7 +581,7 @@ jQuery(document).delegate('a.add-recordparent', 'click', function(e) {
                       </div>
                     <td><div class="col-md-2"></div></td>
                       <div class="form-group col-md-3">
-                         <td>Student Birth Certificate</td>
+                          <td><label>Student Birth Certificate</label></td>
                          <td><input type="file" class="" name="student_birth_certificate" id="student_birth_certificate"></td>
                              <script>
                                  var uploadField = document.getElementById("student_birth_certificate");
@@ -588,7 +597,7 @@ jQuery(document).delegate('a.add-recordparent', 'click', function(e) {
                 </tr>
                  <tr>
                     <div class="col-md-3">
-                         <td>Student Niramaya Card</td>
+                        <td><label>Student Niramaya Card</label></td>
                          <td><input type="file" class="" name="student_Niramaya_card" id="student_Niramaya_card"></td>
                              <script>
                                 var uploadField = document.getElementById("student_Niramaya_card");
@@ -600,20 +609,8 @@ jQuery(document).delegate('a.add-recordparent', 'click', function(e) {
                                 };
                              </script>
                       </div>
-                    <td><div class="col-md-2"></div></td>
-                      <div class="col-md-3">
-                         <td>Student Caste Certificate</td>
-                         <td><input type="file" class="" name="student_caste_certificate" id="student_caste_certificate"></td>
-                             <script>
-                                 var uploadField = document.getElementById("student_caste_certificate");
-                                 uploadField.onchange = function() {
-                                 if(this.files[0].size > 204800){
-                                     alert("File is too big! Size should be less than 200KB");
-                                     this.value = "";
-                                 };
-                                 };
-                             </script>
-                      </div>
+
+
                    </td>
                 </tr>
             </table>
@@ -635,7 +632,7 @@ jQuery(document).delegate('a.add-recordparent', 'click', function(e) {
             <input type="checkbox"  onchange="document.getElementById('formsubmit').disabled = !this.checked;" />&emsp;Agree<br><br>
              <div class="form-row">
                 <div class="form-group col-md-2">
-                    <label>Date of Joining</label>
+                    <label>Date of Joining<span class="asterik">*</span></label>
                     <input type="date" class="form-control form-control-sm" placeholder="Date of Joining*" name="doj" id="doj" required>
                 </div>
              </div>

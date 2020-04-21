@@ -40,6 +40,7 @@ urlpatterns = [
  path('StudentClassListView', student_views.StudentClassListView, name="student_class_list"),
  path('student_class_report/', student_views.StudentClassListView, name="student_class_report"),
  path('student_teacher_report/', student_views.StudentClassListView, name="student_teacher_report"),
+ path('teacherreport', student_views.teacherreport, name="teacherreport"),
  path('StudentTeacherListView', student_views.StudentTeacherListView, name="student_teacher_list"),
  path('student_Teacher_report/', student_views.StudentTeacherListView, name="student_teacher_report"),
  path('StudentListViewAll', student_views.StudentListViewAll, name="student_list_all"),
@@ -52,17 +53,22 @@ urlpatterns = [
  path('payment_due_view', student_views.payment_due_view, name="payment_due_view"),
  path('payment_form/', student_views.fee_submission, name="payment_form"),
  path('paymentForm', student_views.fee_submission, name="paymentForm"),
+ path('fee_payment_report/', student_views.monthly_fee_report, name="monthly_fee_report"),
+ path('fee_report', student_views.fee_report, name="fee_report"),
+
  path('student', student_views.student_report, name='student'),
  path('student_report', student_views.student_report, name='student_report'),
  path('student_details_report/', student_views.home1, name='student_details_report'),
  path('submit_admission', student_views.submit_admission, name="submit_admission"),
  path('classreport', student_views.classreport, name="classreport"),
- path('teacherreport', student_views.teacherreport, name="teacherreport"),
+
  path('assessment_form/', student_views.assessment_form, name="assessment_form"),
  path('submit_assess', student_views.submit_assess, name="submit_assess"),
  path('report', student_views.report, name="report"),
  path('assessment_report_auth_view/', student_views.assessment_report_auth_view, name="assessment_report_auth_view"),
  path('assessment_report_auth_view', student_views.assessment_report_auth_view, name="assessment_report_auth_view"),
+ path('assessment_form_submit/', student_views.assessment_form_submit, name="assessment_form_submit"),
+ path('assessment_form_submit2', student_views.assessment_form_submit2, name="assessment_form_submit2")
 
 ]
 

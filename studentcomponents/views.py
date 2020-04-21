@@ -6,12 +6,13 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from .forms import PaymentForm
 from .models import StudentDetail, StudentParent, StudentSibling, LookUp, Coordinator, Payment, PaymentPaidRecord,\
-    StudentDocument, Assessment
+    StudentDocument, Assessment, AssessmentAdmission
 from easy_pdf.views import PDFTemplateView
 from django.template.defaultfilters import date
 from django.core.files.storage import FileSystemStorage
 from django.contrib import messages
 from django.db.models import Avg, Max, Min, Sum, Count
+import collections
 
 
 def addstr(arg1, arg2):
@@ -187,6 +188,21 @@ def StudentTeacherListView(request):
     return render(request, 'student_teacher_report.html', {'student_teacher': student_teacher})
 
 
+def teacherreport(request):
+    if request.method == 'POST':
+        student1 = request.POST["student_teacher_assigned"]
+        print (student1)
+        f_n = StudentDetail.objects.filter(class_teacher=student1)
+        ff_n = f_n.order_by('class_teacher').values_list('class_teacher',flat=True).distinct()
+        print(ff_n)
+        context1 = {"student": ff_n }
+        list1 = StudentDetail.objects.all()
+        w = {"l": ff_n,"k":f_n}
+        print(f_n)
+        pdf = render_to_pdf('teacher_wise_report.html', w)
+    return HttpResponse(pdf, content_type='application/pdf')
+
+
 def coord_form_submit(request):
     first_name = request.POST["first_name"]
     last_name = request.POST["last_name"]
@@ -277,17 +293,55 @@ def student_auth(request):
     return render(request, 'student_authentication.html', {'title': title})
 
 
+# def payment_due_view(request):
+#     title = 'Payment Details'
+#     student_details = StudentDetail.objects.all()
+#     lookup_ptype = LookUp.objects.filter(lookup_name="paymentType")
+#     if request.method == 'POST':
+#         from_date = request.POST["from_date"]
+#         to_date = request.POST["to_date"]
+#         type_of_payment = request.POST["type_of_payment"]
+#         print(type_of_payment)
+#         admission_number = request.POST["student_admissionno"]
+#
+#         if from_date and to_date:
+#             if not admission_number:
+#                 messages.warning(request, 'No admission number selected, Please select !')
+#                 redirect('payment_due')
+#             else:
+#                 admission_fee = Payment.objects.all()
+#                 uniform_fee = Payment.objects.all()
+#                 fee_set = Payment.objects.filter(student__admission_number=admission_number)
+#                 print(fee_set)
+#                 payment_paid = PaymentPaidRecord.objects.filter(
+#                     fees_paid_type=type_of_payment).filter(
+#                     fees_paid_date__range=[from_date, to_date])
+#                 payment_paid_total = list(PaymentPaidRecord.objects.filter(
+#                     payment__admission_number=admission_number).filter(fees_paid_type=type_of_payment).filter(
+#                     fees_paid_date__range=[from_date, to_date]).aggregate(total=Sum('fees_paid')).values())[0]
+#                 args = {'type_of_payment': type_of_payment, 'fee_set': fee_set,
+#                         'admission_fee': admission_fee, 'uniform_fee': uniform_fee, 'payment_paid': payment_paid,
+#                         'payment_paid_total': payment_paid_total, 'title': title, 'lookup_ptype': lookup_ptype}
+#                 return render(request, 'payment_due.html', args)
+#         else:
+#             messages.warning(request, 'No date selected, Please select !')
+#             redirect('payment_due')
+#     return render(request, 'payment_due.html', {'title': title, 'student_details': student_details,
+#                                                 'lookup_ptype': lookup_ptype})
+
+# View for payment due page
 def payment_due_view(request):
     title = 'Payment Details'
     student_details = StudentDetail.objects.all()
-    lookup_ptype = LookUp.objects.filter(lookup_name="paymentType")
+    lookup_type = LookUp.objects.filter(lookup_name="paymentType")
     if request.method == 'POST':
         from_date = request.POST["from_date"]
         to_date = request.POST["to_date"]
         type_of_payment = request.POST["type_of_payment"]
         print(type_of_payment)
+        type_of_payment = type_of_payment.lower()
+        print(type_of_payment)
         admission_number = request.POST["student_admissionno"]
-
         if from_date and to_date:
             if not admission_number:
                 messages.warning(request, 'No admission number selected, Please select !')
@@ -300,18 +354,19 @@ def payment_due_view(request):
                 payment_paid = PaymentPaidRecord.objects.filter(
                     fees_paid_type=type_of_payment).filter(
                     fees_paid_date__range=[from_date, to_date])
+
                 payment_paid_total = list(PaymentPaidRecord.objects.filter(
                     payment__admission_number=admission_number).filter(fees_paid_type=type_of_payment).filter(
                     fees_paid_date__range=[from_date, to_date]).aggregate(total=Sum('fees_paid')).values())[0]
                 args = {'type_of_payment': type_of_payment, 'fee_set': fee_set,
                         'admission_fee': admission_fee, 'uniform_fee': uniform_fee, 'payment_paid': payment_paid,
-                        'payment_paid_total': payment_paid_total, 'title': title, 'lookup_ptype': lookup_ptype}
+                        'payment_paid_total': payment_paid_total, 'title': title, 'lookup_type': lookup_type}
                 return render(request, 'payment_due.html', args)
         else:
             messages.warning(request, 'No date selected, Please select !')
             redirect('payment_due')
     return render(request, 'payment_due.html', {'title': title, 'student_details': student_details,
-                                                'lookup_ptype': lookup_ptype})
+                                                'lookup_type': lookup_type})
 
 
 def fee_submission(request):
@@ -326,13 +381,49 @@ def fee_submission(request):
         paytype = request.POST["paytype"]
         pay_amount = request.POST["pay_amount"]
         dop = request.POST["dop"]
-        paymentFormObj = PaymentPaidRecord(payment=student_pay, fees_paid_type=paytype, fees_paid=pay_amount,
-                                           fees_paid_date=dop)
-        paymentFormObj.save()
+        fees_comment = request.POST["fees_comment"]
+        payment_form_obj = PaymentPaidRecord(payment=student_pay, fees_paid_type=paytype, fees_paid=pay_amount,
+                                             fees_paid_date=dop, fees_comments=fees_comment)
+        payment_form_obj.save()
         messages.success(request, 'Successfully Saved Payment Form !')
         redirect('/')
     args = {'student_adm_num': student_adm_num, 'lookup_ptype': lookup_ptype}
     return render(request, 'payment_form.html', args)
+
+
+def monthly_fee_report(request):
+    title = 'Monthly fees Report'
+    lookup_type = LookUp.objects.filter(lookup_name="paymentType")
+    print(lookup_type)
+    return render(request, 'fee_payment_report.html', {'title': title, 'lookup_type': lookup_type})
+
+
+def fee_report(request):
+    # fee_set = Payment.objects.all()
+    title = "Fee payment report"
+    status = "CURRENT"
+    student = StudentDetail.objects.filter(status=status)
+    month = request.POST["month"]
+    # year = int(request.POST["year"])
+    if int(request.POST["year"]) < 2050:
+        year = int(request.POST["year"])
+        type_of_payment = request.POST["type_of_payment"]
+        type_of_payment = type_of_payment.lower()
+        fee_set_type = type_of_payment + "_fees_set"
+        print(fee_set_type)
+        fee_set = Payment.objects.order_by(fee_set_type)
+        paid_record = PaymentPaidRecord.objects.order_by('payment').filter(fees_paid_type=type_of_payment).filter(
+            fees_paid_date__year=year)
+        print(month)
+        print(year)
+        args = {'month': month, 'fee_set': fee_set, 'fee_set_type': fee_set_type, 'student': student,
+                'paid_record': paid_record, 'title': title, 'type_of_payment': type_of_payment, 'year': year}
+        pdf = render_to_pdf('fee_payment_pdf.html', args)
+        return HttpResponse(pdf, content_type='application/pdf')
+    else:
+        messages.warning(request, 'Year out of range, Please enter value between 1950 and 2050')
+        return redirect('fee_payment_report')
+
 
 
 def home1(request):
@@ -408,7 +499,6 @@ def submit_admission(request):
         disability = request.POST["disability"]
         disability_percentage = request.POST["disability_percentage"]
         languages_known = request.POST.getlist("language")
-        #other_languages_known = request.POST("others")
         food_preference = request.POST["food_preference"]
         class1 = request.POST["class1"]
         class_teacher = request.POST["class_teacher"]
@@ -428,16 +518,15 @@ def submit_admission(request):
             return redirect('student_list')
         else:
             studentobj.save()
-        #payment data form submission
+        # payment data form submission
         admission_fee = request.POST["admfee"]
         monthly_fee = request.POST["monFee"]
-        admission_fee_paid = request.POST["admfeepaid"]
+
         uniform_fee = request.POST["unifee"]
-        uniform_fee_paid = request.POST["uniFeePaid"]
+
         admS = StudentDetail.objects.get(admission_number=adm)
-        paymentobj = Payment(student=admS,admission_fees_set=admission_fee, monthly_fees_set=monthly_fee,
-                             uniform_fees_set=uniform_fee, admission_fees_paid=admission_fee_paid,
-                             uniform_fees_paid=uniform_fee_paid)
+        paymentobj = Payment(student=admS, admission_fees_set=admission_fee, monthly_fees_set=monthly_fee,
+                             uniform_fees_set=uniform_fee)
         paymentobj.save()
         paymentpaid = Payment.objects.get(student__admission_number=adm)
         print(paymentpaid)
@@ -485,11 +574,7 @@ def submit_admission(request):
                 if parent_name:
                     student.save()
         fs = FileSystemStorage()
-        if 'assessment_sheet' in request.FILES:
-            myfile = request.FILES['assessment_sheet']
-            filename = fs.save(myfile.name, myfile)
-        else:
-            filename = 'blank.txt'
+
         if 'student_pic' in request.FILES:
             mypic = request.FILES['student_pic']
             mypicfile = fs.save(mypic.name, mypic)
@@ -525,7 +610,7 @@ def submit_admission(request):
             mycastefile = fs.save(student_caste_cert.name, student_caste_cert)
         else:
             mycastefile = 'blank.txt'
-        table = StudentDocument(assessment_sheet=filename, student_picture=mypicfile, admission_number=admS,
+        table = StudentDocument(student_picture=mypicfile, admission_number=admS,
                                 adhaar_card_student=myadhaarfile, adhaar_card_guardian=myguardianadhaarfile,
                                 student_disability_card=mydisbcardfile, student_birth_certificate=mybirthcertfile,
                                 student_caste_certificate=mycastefile, student_Niramaya_card=mynircardfile)
@@ -533,6 +618,7 @@ def submit_admission(request):
         messages.success(request, 'Successfully Saved Admission Form !')
         return redirect('/')
     return render(request, 'coord.html')
+
 
 def classreport(request):
     if request.method == 'POST':
@@ -545,19 +631,7 @@ def classreport(request):
         pdf = render_to_pdf('class_teacher_report.html', ww)
     return HttpResponse(pdf, content_type='application/pdf')
 
-def teacherreport(request):
-    if request.method == 'POST':
-        student1 = request.POST["student_teacher_assigned"]
-        print (student1)
-        f_n = StudentDetail.objects.filter(class_teacher=student1)
-        ff_n = f_n.order_by('class_teacher').values_list('class_teacher',flat=True).distinct()
-        print(ff_n)
-        context1 = {"student": ff_n }
-        list1 = StudentDetail.objects.all()
-        w = {"l": ff_n,"k":f_n}
-        print(f_n)
-        pdf = render_to_pdf('teacher_wise_report.html', w)
-    return HttpResponse(pdf, content_type='application/pdf')
+
 
 
 def assessment_form(request):
@@ -630,6 +704,88 @@ def assessment_report_auth_view(request):
         else:
             messages.warning(request, 'Sorry, no matching data found !')
     return render(request, 'parentcomponents/parentHomePage.html')
+
+
+# Take admission number from Front end form(assessment_new.html) and generate assessment form from lookup table
+def assessment_form_submit(request):
+    if request.method == 'POST':
+        adm = request.POST['adm']
+        show_form2 = "show"
+        # If student found in StudentDetails table
+        if StudentDetail.objects.filter(admission_number=adm).exists():
+            student = StudentDetail.objects.get(admission_number=adm)
+            not_in_assess = StudentDetail.objects.filter(assessmentadmission__isnull=True)
+            # If student not found in AssessmentAdmission table
+            if student in not_in_assess:
+                student_details = StudentDetail.objects.get(admission_number=adm)
+                # Ordering all the lookup values in sequence
+                assessment = "Assessment"
+                lookup = LookUp.objects.filter(lookup_type=assessment)
+                # list_1 has values which wont have headings
+                list_1 = []
+                # list_2 has list of all headings(repetitive)
+                list_2 = []
+                # list_3 has values which will have headings
+                list_3 = []
+                # list_4 has list of headings(non repeating)
+                list_4 = []
+                # list_5 has count of headings giving number of values inside each heading
+                list_5 = []
+                # loop to get values which wont have heading
+                for i in lookup:
+                    id_for_each = i.id
+                    input_value = i.lookup_inputvalue
+                    input_value = input_value.lower()
+                    output_value = i.lookup_outputvalue
+                    output_value = output_value.lower()
+                    if input_value == output_value:
+                        list_1.append(input_value)
+                    else:
+                        list_2.append(input_value)
+                        list_3.append(output_value)
+                # getting count of heading
+                c = collections.Counter(list_2)
+                print("count value:", c)
+                for j in c:
+                    print("headings", j)
+                    print("heading count:", c[j])
+                    count = c[j]
+                    list_4.append(j)
+                    list_5.append(count)
+                print("list of val without heading", list_1)
+                print("list of heading", list_2)
+                print("heading distinct", list_4)
+                print("count of headings:", list_5)
+                print("list of val with heading", list_3)
+                args = {"student_details": student_details, "lookup": lookup, "show_form2": show_form2,
+                        'list_1': list_1, 'list_2': list_2, 'list_3': list_3, 'list_4': list_4, 'list_5': list_5}
+                return render(request, 'assessment_new.html', args)
+            # student found in AssessmentAdmission table
+            else:
+                messages.warning(request, 'Assessment form already submitted !')
+                redirect('/')
+        # student not submitted admission form
+        else:
+            messages.warning(request,
+                             'No student found with the admission number, Admission form not submitted.')
+            redirect('assessment_form_submit')
+    return render(request, 'assessment_new.html')
+
+
+# Submitting assessment form
+def assessment_form_submit2(request):
+    assessment_list = LookUp.objects.filter(lookup_type="assessment")
+    stud = request.POST.get("adm")
+    print(stud)
+    adme = StudentDetail.objects.get(admission_number=stud)
+    for item in assessment_list:
+        grade = request.POST.get("a+" + str(item.id))
+        adm = LookUp.objects.get(id=item.id)
+        assess = AssessmentAdmission(lookup_assessment_object=adm, admission_number=adme, heading=item.lookup_outputvalue, field=grade)
+        assess.save()
+    messages.success(request, "Assessment form submitted successfully.")
+    return redirect('assessment_form_submit')
+
 
 
 

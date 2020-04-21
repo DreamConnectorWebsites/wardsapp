@@ -145,7 +145,17 @@ text-decoration: none;
 
 
 	}
+footer {
+    position: fixed;
+    height: 30px;
+    bottom: 0;
+    width: 100%;
+    font-size: 14px;
+    background-color: rgba(255, 255, 255, 0.5);
+    color: black;
+    font-weight: 500;
 
+}
 	  </style>
 
 
@@ -171,14 +181,15 @@ text-decoration: none;
 							<ul class="dropdown" style="margin: 0;padding: 0;list-style:none;">
 								<li><a href="{% url 'coord' %}" style="border-bottom:none;margin-top:unset;">Co-ordinator Form</a></li>
 								<li><a href="{% url 'student_authentication' %}" style="border-bottom:none;margin-top:unset;">Admission Form</a></li>
+								<li><a href="{% url 'assessment_form_submit' %}" style="border-bottom:none;margin-top:unset;">Assessment Form</a></li>
 								<li><a href="{% url 'payment_form' %}" style="border-bottom:none;margin-top:unset;">Payment Form</a></li>
-								<!--<li><a href="{% url 'assessment_form' %}" style="border-bottom:none;margin-top:unset;">Assessment Form</a></li>-->
 							</ul>
 						</li>
 						<li class="has-dropdown"><div class="nav-link dropdown-toggle dropdownhover navcolor" style="margin-top: 0px;">Reports</div>
 							<ul class="dropdown" style="margin: 0;padding: 0;list-style:none;">
 								<li><a href="{% url 'student_class_report' %}" style="border-bottom:none;margin-top:unset;">Class-wise report</a></li>
 								<li><a href="{% url 'student_teacher_report' %}" style="border-bottom:none;margin-top:unset;">Teacher-wise report</a></li>
+								<li><a href="{% url 'monthly_fee_report' %}" style="border-bottom:none;margin-top:unset;">Fee payment report</a></li>
 							</ul>
 						</li>
 						<li><a class="nav-item nav-link navcolor link-design" href="{% url 'payment_due' %}" style="">Payment Details</a></li>
@@ -252,6 +263,22 @@ text-decoration: none;
 		{% endfor %}
 	{% endif %}
     {% block content %}{% endblock content %}
+
+<footer class="fixed-bottom">
+	<p style="padding-left:20px;">Powered by <span style="color:red;font-weight:700;font-size:20px;"><b>CGI</b></span></p>
+	<p style="float:right;">Contact: </p>
+</footer>
+	<script
+  src="https://code.jquery.com/jquery-3.4.1.js"
+  integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+  crossorigin="anonymous"></script>
+
+	<script
+  src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"
+  integrity="sha256-T0Vest3yCU7pafRw9r+settMBX6JkKN06dqBnpQ8d30="
+  crossorigin="anonymous"></script>
+
+
   <script type="text/javascript" src="{% static 'page1/jquery-3.4.1.min.js' %}"></script>
   <script type="text/javascript" src="{% static 'page1/popper.min.js' %}"></script>
   <script type="text/javascript" src="{% static 'page1/imagesloaded.pkgd.min.js' %}"></script>
