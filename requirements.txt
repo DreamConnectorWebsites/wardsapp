@@ -5,7 +5,7 @@ django-easy-pdf==0.1.1
 django-multiselectfield==0.1.8
 django-mysql==3.0.0.post1
 html5lib==1.0.1
-lxml==4.3.3
+lxml==4.6.2
 Markdown==3.1
 mysql-connector-python==8.0.16
 mysqlclient==1.4.2
